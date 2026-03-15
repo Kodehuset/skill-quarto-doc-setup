@@ -23,17 +23,25 @@ quarto --version
 # Check TeX Live
 pdflatex --version
 
-# Check required packages (attempt kpsewhich for each)
-for pkg in libertinus.sty inconsolata.sty multirow.sty mdframed.sty zref.sty needspace.sty titlesec.sty enumitem.sty; do
+# Check required LaTeX packages
+for pkg in libertinus.sty fontspec.sty multirow.sty mdframed.sty zref.sty needspace.sty titlesec.sty enumitem.sty; do
   kpsewhich "$pkg" > /dev/null 2>&1 && echo "OK: $pkg" || echo "MISSING: $pkg"
 done
+
+# Check JetBrains Mono font (system font, not a TeX package)
+fc-list "JetBrains Mono" | head -1 || echo "MISSING: JetBrains Mono font"
 ```
 
 If Quarto is missing, tell the user to install it from https://quarto.org/docs/get-started/
 
+If the JetBrains Mono font is missing, install it:
+```bash
+brew install --cask font-jetbrains-mono
+```
+
 If TeX packages are missing, provide this command:
 ```bash
-sudo tlmgr install libertinus libertinus-fonts libertinus-otf libertine inconsolata multirow mdframed zref needspace titlesec enumitem
+sudo tlmgr install libertinus libertinus-fonts libertinus-otf libertine fontspec multirow mdframed zref needspace titlesec enumitem
 ```
 
 ### Step 2: Choose a Template
@@ -119,7 +127,7 @@ Open the generated PDF and confirm it renders correctly. If there are LaTeX erro
 ### Shared Features (All Templates)
 
 - KOMA-Script `scrartcl` document class (A4 paper, 11pt)
-- Libertinus serif + Inconsolata monospace fonts
+- Libertinus serif + JetBrains Mono monospace fonts (via fontspec/LuaLaTeX)
 - 2.5cm margins on all sides (3cm for minimal-clean)
 - Zero paragraph indent with 8pt paragraph spacing
 - Styled hyperlinks matching accent color with PDF metadata
