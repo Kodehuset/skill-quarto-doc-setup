@@ -1,7 +1,7 @@
 ---
 name: skill-quarto-doc-setup
 description: Set up professional Quarto documentation projects with PDF output via LaTeX templates. Use this skill when the user wants to create a Quarto project, set up a documentation project with PDF output, configure LaTeX templates for Quarto, render markdown to professional PDF, or asks about Quarto document setup. Triggers on mentions of "quarto", "pdf template", "latex template for documents", "documentation project setup", or "professional PDF from markdown".
-version: 1.0.0
+version: 1.1.0
 ---
 
 # Quarto Document Project Setup
@@ -54,17 +54,20 @@ Ask the user for:
 - **Title** (required)
 - **Subtitle** (optional)
 - **Author** (optional)
+- **Date** (optional, e.g., "March 2026")
 - **Organization** (optional)
 - **Document status** (e.g., "Draft", "Final", "Under Review")
+- **Language** (optional, e.g., "norsk" for Norwegian — adds babel support)
 - **Logo file path** (optional, for corporate-report template)
+- **Version** (optional, for technical-manual template)
 
 ### Step 4: Create Project Files
 
-The templates are located in this skill's `templates/` directory. Copy the selected template and create the QMD file.
+The templates are located in this skill's `templates/` directory. Resolve the skill path by finding where this SKILL.md file lives (check `~/.claude/skills/skill-quarto-doc-setup/` for the symlink, or the original repo path). Copy the selected template and create the QMD file.
 
 **4a. Copy the LaTeX template** to the user's project directory:
 ```bash
-cp <skill-path>/templates/<selected-template>.tex <project-dir>/<template-name>.tex
+cp ~/.claude/skills/skill-quarto-doc-setup/templates/<selected-template>.tex <project-dir>/<template-name>.tex
 ```
 
 **4b. Create the QMD document** with this frontmatter structure:
@@ -74,9 +77,11 @@ cp <skill-path>/templates/<selected-template>.tex <project-dir>/<template-name>.
 title: "<title>"
 subtitle: "<subtitle>"
 author: "<author>"
+date: "<date>"
 organization: "<organization>"
 document_status: "<status>"
 short_title: "<abbreviated title for headers>"
+lang: "<language>"  # optional, e.g., "norsk" — omit for English
 titlepage: true
 toc: true
 format:
@@ -92,6 +97,8 @@ Your content here.
 ```
 
 For the **minimal-clean** template, omit `titlepage: true` (it uses an inline title instead).
+
+For the **technical-manual** template, add `version: "<version>"` to show a version number on the title page.
 
 **4c. Add to .gitignore** (if a git repo):
 ```
@@ -113,13 +120,18 @@ Open the generated PDF and confirm it renders correctly. If there are LaTeX erro
 
 - KOMA-Script `scrartcl` document class (A4 paper, 11pt)
 - Libertinus serif + Inconsolata monospace fonts
-- 2.5cm margins on all sides
+- 2.5cm margins on all sides (3cm for minimal-clean)
 - Zero paragraph indent with 8pt paragraph spacing
-- Styled hyperlinks matching accent color
-- Pandoc-compatible (`\tightlist`, `Highlighting` environment)
-- Table of contents support
-- Professional `booktabs`-style tables
+- Styled hyperlinks matching accent color with PDF metadata
+- Full Pandoc/Quarto compatibility (`\tightlist`, `Shaded`, `Highlighting`, `\pandocbounded`, syntax highlighting tokens)
+- `$for(include-before)$` / `$for(include-after)$` content injection
+- Section numbering responds to `number-sections` frontmatter
+- Table of contents with configurable title and depth
+- Professional `booktabs`-style tables with left-aligned longtables
 - Customizable headers/footers with document status
+- Styled inline code with background highlight
+- Optional language support via babel
+- Optional line spacing control
 
 ### Frontmatter Variables
 
@@ -130,12 +142,18 @@ All templates support these QMD YAML variables:
 | `title` | All | Document title |
 | `subtitle` | All except minimal | Subtitle below title |
 | `author` | All | Author name |
+| `date` | All | Date shown on title page |
 | `organization` | All except minimal | Organization name on title page |
 | `document_status` | All | Shown in footer (e.g., "Draft") |
 | `short_title` | All | Abbreviated title for page headers |
+| `lang` | All | Language for babel (e.g., "norsk", "german") |
 | `logo` | corporate-report | Path to logo image for title page |
 | `titlepage` | All except minimal | Set `true` to generate a separate title page |
 | `toc` | All | Set `true` for table of contents |
+| `toc-title` | All | Custom table of contents heading |
+| `toc-depth` | All | TOC depth (default: 3) |
+| `linestretch` | All | Line spacing multiplier (e.g., 1.5) |
+| `version` | technical-manual | Version number on title page |
 | `framework` | assessment-report | Assessment framework name |
 | `total_requirements` | assessment-report | Number of requirements assessed |
 | `assessment_date` | assessment-report | Date of assessment |
@@ -155,6 +173,36 @@ All templates support these QMD YAML variables:
 - `\notebox{text}` — Blue info box
 - `\warningbox{text}` — Orange warning box
 - `\tipbox{text}` — Green tip box
+
+## Troubleshooting
+
+Common issues and fixes:
+
+1. **"Undefined control sequence" for `\pandocbounded`** — You are using an older version of the templates. Re-copy the template from this skill's directory.
+
+2. **Missing LaTeX packages** — Run `kpsewhich <package>.sty` to check. Install with `sudo tlmgr install <package>`.
+
+3. **Section numbers not toggling** — Ensure `number-sections: true/false` is under `format: pdf:`, not at the top level.
+
+4. **Non-English characters broken** — Add `lang: "<language>"` to frontmatter (e.g., `lang: "norsk"` for Norwegian). The templates load babel conditionally.
+
+5. **Overfull hbox warnings** — The templates set `\emergencystretch{3em}` to handle most cases. For persistent issues, try rewording long unbreakable strings.
+
+6. **Images too large** — The `\pandocbounded` macro auto-scales images to fit. Use Quarto's `width` attribute for manual control: `![Caption](image.png){width=80%}`.
+
+## Customization
+
+To add custom LaTeX to the preamble without editing the template, use `header-includes` in frontmatter:
+
+```yaml
+format:
+  pdf:
+    template: corporate-report.tex
+    include-in-header:
+      text: |
+        \usepackage{soul}
+        \definecolor{mycolor}{RGB}{100, 150, 200}
+```
 
 ## Example QMD
 

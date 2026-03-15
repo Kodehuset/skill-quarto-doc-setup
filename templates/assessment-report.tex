@@ -63,11 +63,39 @@
   linkcolor=accent,
   urlcolor=accentlight,
   citecolor=accent,
-  pdfborder={0 0 0}
+  pdfborder={0 0 0},
+$if(title-meta)$
+  pdftitle={$title-meta$},
+$endif$
+$if(author-meta)$
+  pdfauthor={$author-meta$},
+$endif$
+$if(lang)$
+  pdflang={$lang$},
+$endif$
+  pdfcreator={LaTeX via Quarto}
 }
 
 % Graphics
 \usepackage{graphicx}
+
+% Image scaling for Quarto/Pandoc
+\makeatletter
+\newsavebox\pandoc@box
+\newcommand*\pandocbounded[1]{% scales image to fit in text area
+  \sbox\pandoc@box{#1}%
+  \Gscale@div\pandoc@scale{\textheight}{\dimexpr\ht\pandoc@box+\dp\pandoc@box\relax}%
+  \ifdim\wd\pandoc@box>\linewidth
+    \resizebox{\linewidth}{!}{#1}%
+  \else
+    \ifdim\dimexpr\ht\pandoc@box+\dp\pandoc@box\relax>\textheight
+      \resizebox{!}{\textheight}{#1}%
+    \else
+      #1%
+    \fi
+  \fi
+}
+\makeatother
 
 % Code blocks
 \usepackage{fancyvrb}
@@ -136,6 +164,41 @@
 % Pandoc compatibility
 \providecommand{\tightlist}{%
   \setlength{\itemsep}{2pt}\setlength{\parskip}{0pt}}
+
+% Prevent overfull lines
+\setlength{\emergencystretch}{3em}
+
+% Section numbering (responds to number-sections frontmatter)
+$if(numbersections)$
+\setcounter{secnumdepth}{$if(secnumdepth)$$secnumdepth$$else$5$endif$}
+$else$
+\setcounter{secnumdepth}{-\maxdimen}
+$endif$
+
+% Line spacing
+$if(linestretch)$
+\usepackage{setspace}
+$endif$
+
+% Language support
+$if(lang)$
+\usepackage[$lang$]{babel}
+$endif$
+
+% Longtable left-alignment fix
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
+\makeatother
+\setlength{\LTleft}{0pt}
+
+% Footnotes in longtable
+\IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
+\makesavenoteenv{longtable}
+
+% Inline code styling
+\let\oldtexttt\texttt
+\renewcommand{\texttt}[1]{{\small\colorbox{lightgray}{\oldtexttt{#1}}}}
 
 % Syntax highlighting token commands
 \newcommand{\AlertTok}[1]{\textcolor[rgb]{1.00,0.00,0.00}{\textbf{#1}}}
@@ -263,6 +326,11 @@
     {\normalsize Prepared by: $author$\par}
     $endif$
 
+    $if(date)$
+    \vspace{0.3cm}
+    {\normalsize $date$\par}
+    $endif$
+
     $if(document_status)$
     \vspace{1cm}
     {\small\textcolor{textgray}{Document Status: $document_status$}\par}
@@ -289,11 +357,28 @@ $if(titlepage)$
 \maketitlepage
 $endif$
 
+$for(include-before)$
+$include-before$
+
+$endfor$
 $if(toc)$
+$if(toc-title)$
+\renewcommand*\contentsname{$toc-title$}
+$endif$
+{
+\setcounter{tocdepth}{$if(toc-depth)$$toc-depth$$else$3$endif$}
 \tableofcontents
+}
 \newpage
+$endif$
+$if(linestretch)$
+\setstretch{$linestretch$}
 $endif$
 
 $body$
 
+$for(include-after)$
+$include-after$
+
+$endfor$
 \end{document}
