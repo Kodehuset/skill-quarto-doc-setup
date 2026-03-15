@@ -1,0 +1,73 @@
+---
+title: "Example Document Title"
+subtitle: "A Subtitle for Context"
+short_title: "Example Doc"
+author: "Your Name"
+organization: "Your Organization"
+document_status: "Draft"
+titlepage: true
+toc: true
+format:
+  pdf:
+    template: corporate-report.tex
+    number-sections: true
+    keep-tex: false
+---
+
+# Introduction
+
+This is an example Quarto document that renders to a professional PDF using a custom LaTeX template. Replace this content with your own.
+
+## Background
+
+Provide context for the document here. Use standard Markdown syntax — headings, lists, tables, code blocks, and links all work as expected.
+
+Key points:
+
+- First important point
+- Second important point
+- Third important point
+
+## Scope
+
+Define the boundaries of this document.
+
+| Item | In Scope | Notes |
+|------|----------|-------|
+| Topic A | Yes | Primary focus |
+| Topic B | Yes | Secondary focus |
+| Topic C | No | Out of scope for this version |
+
+# Main Content
+
+## Section One
+
+Write your content using standard Markdown. Quarto supports all common Markdown features plus extensions.
+
+### Code Examples
+
+Use fenced code blocks for technical content:
+
+```bash
+echo "Hello from a code block"
+```
+
+### Blockquotes
+
+> Blockquotes are styled with a left border accent matching the template's color scheme.
+
+## Section Two
+
+Continue with additional sections as needed.
+
+1. Numbered lists work as expected
+2. With proper formatting
+3. And consistent spacing
+
+# Conclusion
+
+Summarize key points and next steps.
+
+---
+
+*Document generated with Quarto and a custom LaTeX template.*

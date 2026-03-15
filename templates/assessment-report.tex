@@ -1,0 +1,242 @@
+% Assessment Report Template for Quarto
+% Color-coded status indicators, metadata boxes, and summary tables
+% Based on the CIS Controls assessment template pattern
+\documentclass[11pt,a4paper]{scrartcl}
+
+% ============================================================================
+% PACKAGES
+% ============================================================================
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{libertinus}
+\usepackage{inconsolata}
+
+\usepackage[
+  top=2.5cm,
+  bottom=2.5cm,
+  left=2.5cm,
+  right=2.5cm,
+  headheight=14pt
+]{geometry}
+
+% Colors
+\usepackage[table]{xcolor}
+\definecolor{accent}{RGB}{0, 82, 147}        % Assessment blue
+\definecolor{accentlight}{RGB}{50, 120, 180}
+\definecolor{statusgreen}{RGB}{34, 139, 34}
+\definecolor{statusorange}{RGB}{230, 126, 34}
+\definecolor{statusred}{RGB}{192, 57, 43}
+\definecolor{textgray}{RGB}{85, 85, 85}
+\definecolor{lightgray}{RGB}{245, 245, 245}
+\definecolor{tableborder}{RGB}{200, 200, 200}
+\definecolor{blockquotebg}{RGB}{248, 249, 250}
+\definecolor{blockquoteborder}{RGB}{0, 82, 147}
+
+% Headers and footers
+\usepackage{scrlayer-scrpage}
+\pagestyle{scrheadings}
+\clearpairofpagestyles
+\ohead{\small\textcolor{textgray}{$if(short_title)$$short_title$$else$$title$$endif$}}
+\ofoot{\thepage}
+\ifoot{\small\textcolor{textgray}{$if(document_status)$$document_status$$else$Draft$endif$}}
+
+% Tables
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{multirow}
+\usepackage{tabularx}
+\usepackage{calc}
+\renewcommand{\arraystretch}{1.3}
+\setlength{\tabcolsep}{8pt}
+
+% Lists
+\usepackage{enumitem}
+\setlist[itemize]{topsep=4pt, itemsep=2pt, parsep=0pt, leftmargin=1.5em}
+\setlist[enumerate]{topsep=4pt, itemsep=2pt, parsep=0pt, leftmargin=1.5em}
+
+% Hyperlinks
+\usepackage{hyperref}
+\hypersetup{
+  colorlinks=true,
+  linkcolor=accent,
+  urlcolor=accentlight,
+  citecolor=accent,
+  pdfborder={0 0 0}
+}
+
+% Graphics
+\usepackage{graphicx}
+
+% Code blocks
+\usepackage{fancyvrb}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{
+  commandchars=\\\{\},
+  fontsize=\small,
+  frame=leftline,
+  framerule=2pt,
+  rulecolor=\color{tableborder},
+  xleftmargin=1em,
+  samepage=true
+}
+
+% Blockquotes
+\usepackage{mdframed}
+\usepackage{zref}
+\usepackage{needspace}
+
+\newmdenv[
+  topline=false, bottomline=false, rightline=false, leftline=true,
+  linewidth=3pt, linecolor=blockquoteborder,
+  backgroundcolor=blockquotebg,
+  innerleftmargin=12pt, innerrightmargin=12pt,
+  innertopmargin=8pt, innerbottommargin=8pt,
+  skipabove=12pt, skipbelow=12pt
+]{customquote}
+\renewenvironment{quote}{\begin{customquote}}{\end{customquote}}
+
+% Section formatting
+\usepackage{titlesec}
+\titleformat{\section}
+  {\normalfont\Large\bfseries\color{accent}}
+  {\thesection}{1em}{}
+\titlespacing*{\section}{0pt}{24pt plus 4pt minus 2pt}{12pt plus 2pt minus 2pt}
+
+\titleformat{\subsection}
+  {\normalfont\large\bfseries\color{textgray}}
+  {\thesubsection}{1em}{}
+\titlespacing*{\subsection}{0pt}{18pt plus 3pt minus 2pt}{8pt plus 2pt minus 2pt}
+
+\titleformat{\subsubsection}
+  {\normalfont\normalsize\bfseries}
+  {\thesubsubsection}{1em}{}
+\titlespacing*{\subsubsection}{0pt}{12pt plus 2pt minus 1pt}{6pt plus 1pt minus 1pt}
+
+% Paragraph spacing
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{8pt plus 2pt minus 1pt}
+
+% Pandoc compatibility
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{2pt}\setlength{\parskip}{0pt}}
+
+% ============================================================================
+% CUSTOM COMMANDS
+% ============================================================================
+
+% Status badges
+\newcommand{\statusfully}{\textcolor{statusgreen}{\textbf{Fully met}}}
+\newcommand{\statuspartially}{\textcolor{statusorange}{\textbf{Partially met}}}
+\newcommand{\statusnotmet}{\textcolor{statusred}{\textbf{Not met}}}
+
+% Assessment summary table
+\newcommand{\assessmentsummary}[3]{
+  \begin{center}
+  \begin{tabular}{|>{\centering\arraybackslash}p{4cm}|>{\centering\arraybackslash}p{4cm}|>{\centering\arraybackslash}p{4cm}|}
+    \hline
+    \rowcolor{lightgray}
+    \textbf{Fully Met} & \textbf{Partially Met} & \textbf{Not Met} \\
+    \hline
+    \textcolor{statusgreen}{\Large\textbf{#1}} & \textcolor{statusorange}{\Large\textbf{#2}} & \textcolor{statusred}{\Large\textbf{#3}} \\
+    \hline
+  \end{tabular}
+  \end{center}
+}
+
+% Requirement metadata box
+\newcommand{\requirementmeta}[4]{
+  \begin{tabular}{@{}ll@{}}
+    \textbf{Title:} & #1 \\
+    \textbf{Asset Type:} & #2 \\
+    \textbf{Security Function:} & #3 \\
+  \end{tabular}
+  \vspace{4pt}
+
+  \textbf{Description:} #4
+  \vspace{8pt}
+}
+
+% Section divider
+\newcommand{\sectiondivider}{%
+  \vspace{8pt}
+  \noindent\rule{\textwidth}{0.4pt}
+  \vspace{8pt}
+}
+
+% ============================================================================
+% TITLE PAGE
+% ============================================================================
+
+\newcommand{\maketitlepage}{
+  \begin{titlepage}
+    \centering
+    \vspace*{2cm}
+
+    $if(logo)$
+    \includegraphics[width=0.3\textwidth]{$logo$}\\[1.5cm]
+    $else$
+    \vspace{1.5cm}
+    $endif$
+
+    {\Huge\bfseries\color{accent} $title$\par}
+    \vspace{0.5cm}
+    $if(subtitle)$
+    {\Large\color{textgray} $subtitle$\par}
+    \vspace{1cm}
+    $endif$
+
+    \rule{0.6\textwidth}{0.4pt}\\[1cm]
+
+    $if(framework)$
+    {\large Framework: \textbf{$framework$}\par}
+    \vspace{0.3cm}
+    $endif$
+
+    $if(total_requirements)$
+    {\large Total Requirements: \textbf{$total_requirements$}\par}
+    \vspace{0.3cm}
+    $endif$
+
+    $if(assessment_date)$
+    {\large Assessment Date: \textbf{$assessment_date$}\par}
+    \vspace{1cm}
+    $endif$
+
+    \vfill
+
+    $if(organization)$
+    {\large\textbf{$organization$}\par}
+    \vspace{0.3cm}
+    $endif$
+
+    $if(author)$
+    {\normalsize Prepared by: $author$\par}
+    $endif$
+
+    $if(document_status)$
+    \vspace{1cm}
+    {\small\textcolor{textgray}{Document Status: $document_status$}\par}
+    $endif$
+
+  \end{titlepage}
+}
+
+% ============================================================================
+% DOCUMENT
+% ============================================================================
+
+\begin{document}
+
+$if(titlepage)$
+\maketitlepage
+$endif$
+
+$if(toc)$
+\tableofcontents
+\newpage
+$endif$
+
+$body$
+
+\end{document}
